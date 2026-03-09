@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Modus - Statistika</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #ffd1dc 0%, #c8f4d6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ff69b4;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7ec699;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .score-item {
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c9 100%);
+            padding: 15px 30px;
+            border-radius: 20px;
+            text-align: center;
+            flex: 1;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+        }
+        
+        .score-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .score-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #ff69b4;
+        }
+        
+        .hearts {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        
+        .heart {
+            animation: heartBeat 1s ease infinite;
+        }
+        
+        .heart.lost {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+        
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .timer {
+            text-align: center;
+            font-size: 2em;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #c8f4d6 0%, #a8e6cf 100%);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(126, 198, 153, 0.2);
+        }
+        
+        .timer.warning {
+            animation: timerBlink 0.5s ease infinite;
+            color: #ff1493;
+        }
+        
+        @keyframes timerBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #c8f4d6 0%, #a8e6cf 100%);
+            border-radius: 20px;
+        }
+        
+        .number-box {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #ff69b4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .number-box:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.3);
+        }
+        
+        .number-box.selected {
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c9 100%);
+            box-shadow: 0 0 0 4px #ff69b4, 0 10px 25px rgba(255, 105, 180, 0.4);
+            animation: pulse 0.5s ease;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .key {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #c8f4d6 0%, #a8e6cf 100%);
+            border: none;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #4a9d6f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(126, 198, 153, 0.2);
+            font-family: 'Quicksand', sans-serif;
+        }
+        
+        .key:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(126, 198, 153, 0.3);
+        }
+        
+        .key:active {
+            transform: translateY(0);
+        }
+        
+        .answer-display {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 2em;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #7ec699 0%, #5fa87e 100%);
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(126, 198, 153, 0.4);
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            animation: slideIn 0.5s ease;
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .feedback.correct {
+            background: linear-gradient(135deg, #c8f4d6 0%, #a8e6cf 100%);
+            color: #4a9d6f;
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c9 100%);
+            color: #ff69b4;
+            display: block;
+        }
+        
+        .game-over {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c9 100%);
+            border-radius: 20px;
+            margin-top: 20px;
+        }
+        
+        .game-over.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .game-over h2 {
+            font-size: 2.5em;
+            color: #ff69b4;
+            margin-bottom: 20px;
+        }
+        
+        .game-over p {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .btn-restart {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: white;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+        
+        .btn-restart:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+        }
+        
+        .game-content.hide {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .numbers-grid {
+                grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+                gap: 10px;
+            }
+            
+            .number-box {
+                font-size: 1.5em;
+            }
+            
+            .keypad {
+                gap: 8px;
+            }
+            
+            .key {
+                font-size: 1.3em;
+            }
+            
+            .hearts {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> Modus Mission</h1>
+        <p class="subtitle">Temukan angka yang paling sering muncul!</p>
+        
+        <div id="gameContent" class="game-content">
+            <div class="score-board">
+                <div class="score-item">
+                    <div class="score-label">Skor</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Waktu</div>
+                    <div class="score-value" id="timer">40</div>
+                </div>
+            </div>
+            
+            <div class="hearts" id="hearts">
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+            </div>
+            
+            <div class="numbers-grid" id="numbersGrid"></div>
+            
+            <div class="input-section">
+                <div class="answer-display" id="answerDisplay">?</div>
+                
+                <div class="keypad">
+                    <button class="key" onclick="inputNumber(0)">0</button>
+                    <button class="key" onclick="inputNumber(1)">1</button>
+                    <button class="key" onclick="inputNumber(2)">2</button>
+                    <button class="key" onclick="inputNumber(3)">3</button>
+                    <button class="key" onclick="inputNumber(4)">4</button>
+                    <button class="key" onclick="inputNumber(5)">5</button>
+                    <button class="key" onclick="inputNumber(6)">6</button>
+                    <button class="key" onclick="inputNumber(7)">7</button>
+                    <button class="key" onclick="inputNumber(8)">8</button>
+                    <button class="key" onclick="inputNumber(9)">9</button>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-submit" onclick="checkAnswer()">Submit</button>
+                    <button class="btn btn-reset" onclick="resetAnswer()">Reset</button>
+                </div>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+        </div>
+        
+        <div class="game-over" id="gameOver">
+            <h2 id="gameOverTitle">🎮 Game Selesai!</h2>
+            <p id="gameOverMessage">Skor Akhir: <span id="finalScore">0</span></p>
+            <button class="btn-restart" onclick="restartGame()">Main Lagi</button>
+        </div>
+    </div>
+    
+    <script>
+        let numbers = [];
+        let userAnswer = '';
+        let score = 0;
+        let hearts = 5;
+        let currentModus = null;
+        let timer = 40;
+        let timerInterval = null;
+        let gameActive = true;
+        
+        function generateNumbers() {
+            numbers = [];
+            const availableNums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            
+            // Pilih 1 angka yang akan menjadi modus
+            const modusIdx = Math.floor(Math.random() * availableNums.length);
+            const modusNumber = availableNums[modusIdx];
+            availableNums.splice(modusIdx, 1);
+            
+            // Tentukan frekuensi modus (4-6 kali)
+            const modusFreq = 4 + Math.floor(Math.random() * 3);
+            
+            // Masukkan angka modus
+            for (let i = 0; i < modusFreq; i++) {
+                numbers.push(modusNumber);
+            }
+            
+            // Isi sisa dengan angka lain (frekuensi 1-2 kali, lebih rendah dari modus)
+            while (numbers.length < 20) {
+                if (availableNums.length === 0) {
+                    // Reset available numbers jika habis
+                    availableNums.push(1, 2, 3, 4, 5, 6, 7, 8, 9);
+                    const idx = availableNums.indexOf(modusNumber);
+                    if (idx > -1) availableNums.splice(idx, 1);
+                }
+                
+                const idx = Math.floor(Math.random() * availableNums.length);
+                const num = availableNums[idx];
+                
+                // Hitung berapa kali angka ini sudah muncul
+                const count = numbers.filter(n => n === num).length;
+                
+                // Pastikan tidak muncul lebih dari 2 kali
+                if (count < 2) {
+                    numbers.push(num);
+                } else {
+                    availableNums.splice(idx, 1);
+                }
+            }
+            
+            // Acak urutan
+            numbers.sort(() => Math.random() - 0.5);
+            
+            // Set modus yang sebenarnya
+            currentModus = modusNumber;
+        }
+        
+        function renderNumbers() {
+            const grid = document.getElementById('numbersGrid');
+            grid.innerHTML = '';
+            
+            numbers.forEach((num, idx) => {
+                const box = document.createElement('div');
+                box.className = 'number-box';
+                box.textContent = num;
+                box.onclick = () => highlightNumber(num);
+                grid.appendChild(box);
+            });
+        }
+        
+        function highlightNumber(num) {
+            const boxes = document.querySelectorAll('.number-box');
+            boxes.forEach(box => {
+                if (parseInt(box.textContent) === num) {
+                    box.classList.toggle('selected');
+                }
+            });
+        }
+        
+        function inputNumber(num) {
+            if (!gameActive) return;
+            if (userAnswer.length < 2) {
+                userAnswer += num;
+                document.getElementById('answerDisplay').textContent = userAnswer;
+            }
+        }
+        
+        function resetAnswer() {
+            if (!gameActive) return;
+            userAnswer = '';
+            document.getElementById('answerDisplay').textContent = '?';
+            document.getElementById('feedback').style.display = 'none';
+            
+            const boxes = document.querySelectorAll('.number-box');
+            boxes.forEach(box => box.classList.remove('selected'));
+        }
+        
+        function checkAnswer() {
+            if (!gameActive) return;
+            if (userAnswer === '') {
+                showFeedback('Masukkan jawaban terlebih dahulu!', false);
+                return;
+            }
+            
+            const answer = parseInt(userAnswer);
+            
+            if (answer === currentModus) {
+                score += 10;
+                document.getElementById('score').textContent = score;
+                showFeedback('🎉 Benar! Kamu berhasil menemukan modus!', true);
+                
+                // Cek apakah skor sudah 100
+                if (score >= 100) {
+                    setTimeout(() => {
+                        endGame(true);
+                    }, 1500);
+                } else {
+                    setTimeout(() => {
+                        generateNewRound();
+                    }, 1500);
+                }
+            } else {
+                loseHeart();
+                showFeedback('❌ Coba lagi, hitung dengan teliti ya!', false);
+            }
+        }
+        
+        function loseHeart() {
+            hearts--;
+            updateHearts();
+            
+            if (hearts <= 0) {
+                gameActive = false;
+                setTimeout(() => {
+                    endGame(false);
+                }, 1500);
+            }
+        }
+        
+        function updateHearts() {
+            const heartElements = document.querySelectorAll('.heart');
+            heartElements.forEach((heart, idx) => {
+                if (idx >= hearts) {
+                    heart.classList.add('lost');
+                } else {
+                    heart.classList.remove('lost');
+                }
+            });
+        }
+        
+        function showFeedback(message, isCorrect) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 1500);
+        }
+        
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timer = 40;
+            document.getElementById('timer').textContent = timer;
+            document.getElementById('timer').classList.remove('warning');
+            
+            timerInterval = setInterval(() => {
+                if (!gameActive) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                
+                timer--;
+                document.getElementById('timer').textContent = timer;
+                
+                if (timer <= 10) {
+                    document.getElementById('timer').classList.add('warning');
+                }
+                
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    loseHeart();
+                    showFeedback('⏰ Waktu habis!', false);
+                    
+                    if (hearts > 0) {
+                        setTimeout(() => {
+                            generateNewRound();
+                        }, 1500);
+                    }
+                }
+            }, 1000);
+        }
+        
+        function generateNewRound() {
+            generateNumbers();
+            renderNumbers();
+            resetAnswer();
+            startTimer();
+        }
+        
+        function endGame(isWin) {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            document.getElementById('gameContent').classList.add('hide');
+            document.getElementById('gameOver').classList.add('show');
+            document.getElementById('finalScore').textContent = score;
+            
+            if (isWin) {
+                document.getElementById('gameOverTitle').textContent = '🤩 Selamat! Kamu Menang!';
+                document.getElementById('gameOverMessage').textContent = `Skor Akhir: ${score} - Sempurna!`;
+            } else {
+                document.getElementById('gameOverTitle').textContent = '💔 Game Over!';
+                document.getElementById('gameOverMessage').textContent = `Skor Akhir: ${score}`;
+            }
+        }
+        
+        function restartGame() {
+            score = 0;
+            hearts = 5;
+            gameActive = true;
+            
+            document.getElementById('score').textContent = score;
+            updateHearts();
+            
+            document.getElementById('gameContent').classList.remove('hide');
+            document.getElementById('gameOver').classList.remove('show');
+            
+            generateNewRound();
+        }
+        
+        // Inisialisasi game
+        generateNumbers();
+        renderNumbers();
+        startTimer();
+    </script>
+</body>
+</html>
