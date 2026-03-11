@@ -31,6 +31,7 @@
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
             animation: fadeIn 0.5s ease;
+            position: relative;
         }
         
         @keyframes fadeIn {
@@ -331,6 +332,174 @@
         .game-content.hide {
             display: none;
         }
+
+        .game-content {
+            position: relative;
+        }
+
+        .player-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .player-corner {
+            flex: 1;
+            min-width: 220px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 2px solid transparent;
+            border-radius: 14px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .player-corner.left {
+            left: 0;
+            border-color: #ffb3c9;
+        }
+
+        .player-corner.right {
+            right: 0;
+            border-color: #a8e6cf;
+            text-align: right;
+        }
+
+        .player-label {
+            font-size: 0.76em;
+            color: #777;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .player-value {
+            font-size: 1em;
+            font-weight: 700;
+            color: #ff69b4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+
+        .player-meta {
+            font-size: 0.75em;
+            color: #8a8a8a;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-corner.right .player-value {
+            color: #4a9d6f;
+        }
+
+        .player-setup {
+            position: absolute;
+            inset: 0;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(255, 209, 220, 0.96) 0%, rgba(200, 244, 214, 0.96) 100%);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            padding: 24px;
+        }
+
+        .player-setup.show {
+            display: flex;
+        }
+
+        .setup-card {
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 22px;
+            padding: 26px;
+            box-shadow: 0 14px 30px rgba(255, 105, 180, 0.18);
+        }
+
+        .setup-card h2 {
+            color: #ff69b4;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.7em;
+        }
+
+        .setup-card p {
+            text-align: center;
+            color: #5fa87e;
+            margin-bottom: 18px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .setup-field {
+            margin-bottom: 14px;
+        }
+
+        .setup-field label {
+            display: block;
+            color: #666;
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 0.92em;
+        }
+
+        .setup-field input {
+            width: 100%;
+            border: 2px solid #ffd1dc;
+            border-radius: 12px;
+            padding: 11px 13px;
+            font-size: 1em;
+            font-family: 'Quicksand', sans-serif;
+            color: #555;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .setup-field input:focus {
+            border-color: #7ec699;
+            box-shadow: 0 0 0 3px rgba(126, 198, 153, 0.2);
+        }
+
+        .setup-actions {
+            margin-top: 18px;
+        }
+
+        .btn-start {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 1.05em;
+            font-weight: 700;
+            font-family: 'Quicksand', sans-serif;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ff69b4 0%, #7ec699 100%);
+            box-shadow: 0 8px 20px rgba(126, 198, 153, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(255, 105, 180, 0.3);
+        }
+
+        .setup-error {
+            min-height: 20px;
+            margin-top: 10px;
+            text-align: center;
+            color: #ff4d8d;
+            font-weight: 700;
+            font-size: 0.88em;
+        }
         
         @media (max-width: 600px) {
             .container {
@@ -361,6 +530,24 @@
             .hearts {
                 font-size: 1.5em;
             }
+
+            .player-corner {
+                min-width: 100%;
+                padding: 6px 8px;
+                border-radius: 12px;
+            }
+
+            .player-value {
+                font-size: 0.86em;
+            }
+
+            .setup-card {
+                padding: 20px;
+            }
+
+            .setup-card h2 {
+                font-size: 1.4em;
+            }
         }
     </style>
 </head>
@@ -368,8 +555,40 @@
     <div class="container">
         <h1> Modus Mission</h1>
         <p class="subtitle">Temukan angka yang paling sering muncul!</p>
+
+        <div class="player-setup show" id="playerSetup">
+            <form class="setup-card" onsubmit="handlePlayerSetup(event)">
+                <h2>Data Pemain</h2>
+                <p>Isi nama dan nomor absen dulu sebelum mulai bermain.</p>
+                <div class="setup-field">
+                    <label for="playerNameInput">Nama</label>
+                    <input id="playerNameInput" type="text" maxlength="30" placeholder="Contoh: Dwi Fransiska" required>
+                </div>
+                <div class="setup-field">
+                    <label for="playerAbsenInput">Absen</label>
+                    <input id="playerAbsenInput" type="text" maxlength="8" placeholder="Contoh: 17" required>
+                </div>
+                <div class="setup-actions">
+                    <button type="submit" class="btn-start">Mulai Permainan</button>
+                </div>
+                <div id="setupError" class="setup-error"></div>
+            </form>
+        </div>
         
         <div id="gameContent" class="game-content">
+            <div class="player-bar">
+                <div class="player-corner left">
+                    <div class="player-label">Pemain</div>
+                    <div class="player-value" id="playerNameDisplay">-</div>
+                    <div class="player-meta" id="playerNameMeta">Selamat bermain!</div>
+                </div>
+                <div class="player-corner right">
+                    <div class="player-label">No. Absen</div>
+                    <div class="player-value" id="playerAbsenDisplay">-</div>
+                    <div class="player-meta" id="playerAbsenMeta">Data pemain</div>
+                </div>
+            </div>
+
             <div class="score-board">
                 <div class="score-item">
                     <div class="score-label">Skor</div>
@@ -432,6 +651,82 @@
         let timer = 40;
         let timerInterval = null;
         let gameActive = true;
+        let playerName = '';
+        let playerAbsen = '';
+        const NAME_DISPLAY_LIMIT = 14;
+
+        function normalizeText(value) {
+            return value.trim().replace(/\s+/g, ' ');
+        }
+
+        function toTitleCase(value) {
+            return value
+                .toLowerCase()
+                .split(' ')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function formatAbsen(value) {
+            return /^\d+$/.test(value) ? `No. ${value}` : value;
+        }
+
+        function truncateName(value) {
+            if (value.length <= NAME_DISPLAY_LIMIT) return value;
+            return value.slice(0, NAME_DISPLAY_LIMIT) + '...';
+        }
+
+        function updatePlayerDisplay() {
+            const displayName = toTitleCase(playerName);
+            const displayAbsen = formatAbsen(playerAbsen);
+
+            const playerNameDisplay = document.getElementById('playerNameDisplay');
+            const playerAbsenDisplay = document.getElementById('playerAbsenDisplay');
+
+            playerNameDisplay.textContent = truncateName(displayName);
+            playerNameDisplay.title = displayName;
+            playerAbsenDisplay.textContent = displayAbsen;
+
+            document.getElementById('playerNameMeta').textContent = `Hai, ${truncateName(displayName)}!`;
+            document.getElementById('playerNameMeta').title = displayName;
+            document.getElementById('playerAbsenMeta').textContent = `Identitas: ${displayAbsen}`;
+        }
+
+        function handlePlayerSetup(event) {
+            event.preventDefault();
+
+            const setupError = document.getElementById('setupError');
+            const rawName = document.getElementById('playerNameInput').value;
+            const rawAbsen = document.getElementById('playerAbsenInput').value;
+            const cleanName = normalizeText(rawName);
+            const cleanAbsen = normalizeText(rawAbsen);
+
+            if (!cleanName || !cleanAbsen) {
+                setupError.textContent = 'Nama dan absen wajib diisi.';
+                return;
+            }
+
+            playerName = cleanName;
+            playerAbsen = cleanAbsen;
+            setupError.textContent = '';
+            document.getElementById('playerSetup').classList.remove('show');
+
+            startFreshGame();
+        }
+
+        function startFreshGame() {
+            score = 0;
+            hearts = 5;
+            gameActive = true;
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('gameContent').classList.remove('hide');
+            document.getElementById('gameOver').classList.remove('show');
+
+            updateHearts();
+            updatePlayerDisplay();
+            generateNewRound();
+        }
         
         function generateNumbers() {
             numbers = [];
@@ -643,23 +938,12 @@
         }
         
         function restartGame() {
-            score = 0;
-            hearts = 5;
-            gameActive = true;
-            
-            document.getElementById('score').textContent = score;
-            updateHearts();
-            
-            document.getElementById('gameContent').classList.remove('hide');
-            document.getElementById('gameOver').classList.remove('show');
-            
-            generateNewRound();
+            startFreshGame();
         }
         
-        // Inisialisasi game
-        generateNumbers();
-        renderNumbers();
-        startTimer();
+        // Tahan game sampai data pemain diisi
+        gameActive = false;
+        updateHearts();
     </script>
 </body>
 </html>
